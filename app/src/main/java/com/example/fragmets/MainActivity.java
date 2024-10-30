@@ -15,41 +15,50 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity {
 
-
+    Button boton1;
+    Button boton2;
+    private String boton_elegido;
+    private String msg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null && savedInstanceState.getString("fragment") != null) {
+            boton_elegido=savedInstanceState.getString("fragment");}
         if (isLandscapeMode()) {
-            Log.d("FragmentTransaction", "lansacape");
-            FrameLayout frame1;
-            FrameLayout frame2;
-            super.onCreate(savedInstanceState);
-            EdgeToEdge.enable(this);
-            Log.d("FragmentTransaction", "lansacape");
-            setContentView(R.layout.activity_main);
-            Log.d("FragmentTransaction", "lansacape3");
-            Log.d("FragmentTransaction", "lansacape4");
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            Log.d("FragmentTransaction", "lansacape5");
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            Log.d("FragmentTransaction", "lansacape6");
-            FirstFragment fragment = FirstFragment.newInstance("Has apretado el boton1!","#985d38");
-            Log.d("FragmentTransaction", "lansacape7");
-            FirstFragment fragment2 = FirstFragment.newInstance("Has apretado el boton2!","#623532");
-            Log.d("FragmentTransaction", "lansacape8");
-            fragmentTransaction.replace(R.id.frame1, fragment);
-            Log.d("FragmentTransaction", "Replacing frame1 with fragment1");
 
+            if (savedInstanceState != null && savedInstanceState.getString("fragment") != null) {
+                boton_elegido=savedInstanceState.getString("fragment");
+                msg="El último boton apretado es el "+boton_elegido+"!";
+            }else{
+                msg="Pon el modo vertical para apretar un boton";
+            }
+
+
+            EdgeToEdge.enable(this);
+            setContentView(R.layout.activity_main);
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+
+                return insets;
+            });
+            setContentView(R.layout.activity_main);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            FirstFragment fragment = FirstFragment.newInstance(msg,"#985d38");
+            FirstFragment fragment2 = FirstFragment.newInstance("Yo solo existo en lansacape!","#623532");
+            fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            fragmentTransaction.replace(R.id.frame1, fragment);
             fragmentTransaction.replace(R.id.frame2, fragment2);
-            Log.d("FragmentTransaction", "Replacing frame2 with fragment2");
             fragmentTransaction.commit();
         }
         else {
-            Button boton1;
-            Button boton2;
-            FrameLayout frame;
-        super.onCreate(savedInstanceState);
+
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -66,9 +75,10 @@ public class MainActivity extends AppCompatActivity {
         boton2.setOnClickListener(v -> {
             boton2();
                 });
-        frame= findViewById(R.id.frame);}
+       }
     }
     private void boton1() {
+        boton_elegido="1";
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -78,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
     private void boton2(){
+            boton_elegido="2";
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             FirstFragment fragment2 = FirstFragment.newInstance("Has apretado el boton2!","#623532");
@@ -93,5 +104,13 @@ public class MainActivity extends AppCompatActivity {
         // Get the current configuration
         int orientation = getResources().getConfiguration().orientation;
         return orientation == Configuration.ORIENTATION_LANDSCAPE;
+    }
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+
+        if(boton_elegido!=null){
+        savedInstanceState.putString("fragment",boton_elegido);}
+
     }
 }
